@@ -12,7 +12,7 @@ intents.message_content = True
 
 bot = commands.Bot(command_prefix="+", intents=intents)
 
-if os.path.exists("../pythonProject/vouches.json"):
+if os.path.exists("vouches.json"):
     with open("../pythonProject/vouches.json", "r") as f:
         vouches = json.load(f)
 else:
@@ -36,6 +36,7 @@ async def vouch(ctx, member: discord.Member):
         await ctx.send(f"✅ {member.mention} a maintenant {vouches[str(member.id)]} vouches !")
     except:
         await ctx.send("❌ Je n'ai pas la permission de modifier le pseudo.")
+
 
 
 bot.run(TOKEN)
