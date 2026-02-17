@@ -1,40 +1,32 @@
-from flask import Flask
-from threading import Thread
-import os
-
-app = Flask(__name__)
-
-@app.route('/')
-def home():
-    return "Bot is running!"
-
-def run_web():
-    port = int(os.environ.get("PORT", 10000))
-    app.run(host="0.0.0.0", port=port)
-
-Thread(target=run_web).start()
-
 import discord
 from discord.ext import commands
 import json
 import os
 
-import os
+# ===== TOKEN =====
 TOKEN = os.getenv("TOKEN")
 
+# ===== INTENTS =====
 intents = discord.Intents.default()
 intents.members = True
 intents.message_content = True
 
 bot = commands.Bot(command_prefix="+", intents=intents)
 
+# ===== CHARGEMENT DES VOUCHES =====
+vouches = {}
+
 if os.path.exists("vouches.json"):
-    with open("../pythonProject/vouches.json", "r") as f:
-        vouches = json.load(f)
+    try:
+        with open("vouches.json", "r", encoding="utf-8") as f:
+            vouches = json.load(f)
+    except:
+        vouches = {}
 else:
-    vouches = {}
+    with open("vouches.json", "w", encoding="utf-8") as f:
+        json.dump({}, f)
 
-
+# ===== COMMANDE VOUCH =====
 @bot.command()
 async def vouch(ctx, member: discord.Member):
     if str(member.id) not in vouches:
@@ -42,8 +34,8 @@ async def vouch(ctx, member: discord.Member):
 
     vouches[str(member.id)] += 1
 
-    with open("../pythonProject/vouches.json", "w") as f:
-        json.dump(vouches, f)
+    with open("vouches.json", "w", encoding="utf-8") as f:
+        json.dump(vouches, f, indent=4)
 
     new_name = f"{member.name} 『{vouches[str(member.id)]} Vouches ✅』"
 
@@ -53,7 +45,5 @@ async def vouch(ctx, member: discord.Member):
     except:
         await ctx.send("❌ Je n'ai pas la permission de modifier le pseudo.")
 
-
-
+# ===== LANCEMENT =====
 bot.run(TOKEN)
-
